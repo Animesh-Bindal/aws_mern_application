@@ -1,0 +1,4 @@
+node_modules/
+package.json
+package-lock.json
+index_conn_test.js
