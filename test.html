@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Package Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}:root{--bg:#ffffff;--surface:#f7f7f8;--border:#e2e2e2;--border-dark:#c8c8c8;--text:#111111;--text-muted:#777777;--accent:#0066ff;--accent-light:#e8f0ff;--header-bg:#111111;--header-text:#ffffff;--row-hover:#f0f5ff;--row-alt:#fafafa;--section-bg:#f3f4f6;}body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:36px 32px;}.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}.page-header-left h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;}.subtitle{font-family:'DM Mono',monospace;font-size:11px;color:var(--text-muted);}.export-btn{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--header-bg);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s;position:relative;}.export-btn:hover{background:#222;}.export-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1.5px solid var(--border-dark);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);overflow:hidden;z-index:100;min-width:140px;display:none;}.export-dropdown.open{display:block;}.export-option{display:flex;align-items:center;gap:9px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:background 0.1s;color:var(--text);}.export-option:hover{background:var(--accent-light);color:var(--accent);}.controls-section{background:var(--section-bg);border:1.5px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:14px;}.controls-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);margin-bottom:10px;}.dropdowns-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);}.dropdown-group{display:flex;flex-direction:column;gap:5px;}.dropdown-group label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);}.ctrl-select{font-family:'DM Mono',monospace;font-size:12px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;background:#fff;color:var(--text);cursor:pointer;outline:none;transition:border-color 0.15s,box-shadow 0.15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}.ctrl-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}.filters-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.filter-group{display:flex;flex-direction:column;gap:5px;}.filter-group label{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);}.filter-input{width:100%;padding:7px 10px;font-family:'DM Mono',monospace;font-size:12px;border:1.5px solid var(--border);border-radius:7px;background:#fff;color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;}.filter-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}.filter-input::placeholder{color:#bbb;}.table-wrapper{border:1.5px solid var(--border-dark);border-radius:10px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);}.table-scroll{overflow-x:auto;}table{width:100%;border-collapse:collapse;font-size:13px;min-width:800px;}thead th{background:var(--header-bg);color:var(--header-text);padding:13px 16px;text-align:left;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.8px;text-transform:uppercase;cursor:pointer;user-select:none;white-space:nowrap;transition:background 0.15s;}thead th:hover{background:#1e1e1e;}.col-head-inner{display:flex;align-items:center;gap:8px;}.sort-icon{display:flex;flex-direction:column;gap:2px;opacity:0.35;transition:opacity 0.15s;}.sort-icon svg{display:block;}th:hover .sort-icon,th.sort-asc .sort-icon,th.sort-desc .sort-icon{opacity:1;}th.sort-asc .arrow-up{opacity:1;}th.sort-asc .arrow-down{opacity:0.25;}th.sort-desc .arrow-up{opacity:0.25;}th.sort-desc .arrow-down{opacity:1;}th.sort-asc .sort-icon,th.sort-desc .sort-icon{color:#60a5fa;}tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}tbody tr:last-child{border-bottom:none;}tbody tr:nth-child(even){background:var(--row-alt);}tbody tr:hover{background:var(--row-hover);}tbody td{padding:10px 16px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}.no-results{text-align:center;padding:52px;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:12px;}.loading-overlay{text-align:center;padding:52px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);}.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;margin-bottom:10px;}@keyframes spin{to{transform:rotate(360deg);}}.pagination-bar{display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:14px 0 0;flex-wrap:wrap;}.rows-per-page{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);}.rows-per-page select{font-family:'DM Mono',monospace;font-size:12px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;outline:none;}.rows-per-page select:focus{border-color:var(--accent);}.page-info{font-family:'DM Mono',monospace;font-size:12px;color:var(--text-muted);white-space:nowrap;}.page-nav{display:flex;align-items:center;gap:6px;}.nav-btn{width:32px;height:32px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:var(--text);}.nav-btn:hover:not(:disabled){border-color:var(--accent);background:var(--accent-light);color:var(--accent);}.nav-btn:disabled{opacity:0.3;cursor:not-allowed;}.error-banner{background:#fde8e8;border:1.5px solid #f5c2c2;border-radius:8px;padding:12px 16px;font-family:'DM Mono',monospace;font-size:12px;color:#c0392b;margin-bottom:14px;display:none;}.error-banner.visible{display:block;}.api-notice{background:var(--accent-light);border:1.5px solid #b3cfff;border-radius:8px;padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;color:#0044cc;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-left">
+    <h1>Package Registry</h1>
+    <p class="subtitle" id="subtitleInfo">// Loading data…</p>
+  </div>
+  <div style="position:relative">
+    <button class="export-btn" onclick="toggleExportMenu()" id="exportBtn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 10v2a1 1 0 001 1h8a1 1 0 001-1v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Export
+    </button>
+    <div class="export-dropdown" id="exportDropdown">
+      <div class="export-option" onclick="exportData('xlsx')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#137a45" stroke-width="1.4"/><path d="M4 4l6 6M10 4L4 10" stroke="#137a45" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Excel (.xlsx)
+      </div>
+      <div class="export-option" onclick="exportData('pdf')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#c0392b" stroke-width="1.4"/><path d="M4 4h4M4 7h6M4 10h5" stroke="#c0392b" stroke-width="1.4" stroke-linecap="round"/></svg>
+        PDF
+      </div>
+      <div class="export-option" onclick="exportData('csv')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#0066ff" stroke-width="1.4"/><path d="M4 4h6M4 7h6M4 10h4" stroke="#0066ff" stroke-width="1.4" stroke-linecap="round"/></svg>
+        CSV
+      </div>
+      <div class="export-option" onclick="exportData('json')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#e67e22" stroke-width="1.4"/><path d="M5 4c-1 0-1.5.5-1.5 1.5v1c0 .5-.5 1-1 1 .5 0 1 .5 1 1v1C3.5 9.5 4 10 5 10M9 4c1 0 1.5.5 1.5 1.5v1c0 .5.5 1 1 1-.5 0-1 .5-1 1v1C10.5 9.5 10 10 9 10" stroke="#e67e22" stroke-width="1.4" stroke-linecap="round"/></svg>
+        JSON
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="api-notice" id="apiNotice">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#0066ff" stroke-width="1.4"/><path d="M7 6v4M7 4v.5" stroke="#0066ff" stroke-width="1.4" stroke-linecap="round"/></svg>
+  Set <code style="background:#d0e4ff;padding:1px 5px;border-radius:3px">API_URL</code> at the top of the script to connect your Django API. Demo data shown until then.
+</div>
+
+<div class="error-banner" id="errorBanner"></div>
+
+<!-- CONTROLS: Dropdowns + Filters -->
+<div class="controls-section">
+  <div class="controls-label">Filters &amp; Selection</div>
+
+  <div class="dropdowns-row">
+    <div class="dropdown-group">
+      <label>Platform Version</label>
+      <select class="ctrl-select" id="ddPlatform" onchange="onDropdownChange()"></select>
+    </div>
+    <div class="dropdown-group">
+      <label>Model ID</label>
+      <select class="ctrl-select" id="ddModel" onchange="onDropdownChange()"></select>
+    </div>
+    <div class="dropdown-group">
+      <label>Local Set</label>
+      <select class="ctrl-select" id="ddLocalSet" onchange="onDropdownChange()"></select>
+    </div>
+  </div>
+
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>Package Name</label>
+      <input class="filter-input" type="text" placeholder="Filter…" data-col="0" oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>App ID</label>
+      <input class="filter-input" type="text" placeholder="Filter…" data-col="1" oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>Placeholder</label>
+      <input class="filter-input" type="text" placeholder="Filter…" data-col="2" oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>Package Type</label>
+      <input class="filter-input" type="text" placeholder="Filter…" data-col="3" oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>Diamond Reg. Status</label>
+      <input class="filter-input" type="text" placeholder="Filter…" data-col="4" oninput="applyFilters()">
+    </div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrapper">
+  <div class="table-scroll">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)"><div class="col-head-inner">Package Name <span class="sort-icon"><svg class="arrow-up" width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0Z" fill="currentColor"/></svg><svg class="arrow-down" width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0H8Z" fill="currentColor"/></svg></span></div></th>
+          <th onclick="sortTable(1)"><div class="col-head-inner">App ID <span class="sort-icon"><svg class="arrow-up" width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0Z" fill="currentColor"/></svg><svg class="arrow-down" width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0H8Z" fill="currentColor"/></svg></span></div></th>
+          <th onclick="sortTable(2)"><div class="col-head-inner">Placeholder <span class="sort-icon"><svg class="arrow-up" width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0Z" fill="currentColor"/></svg><svg class="arrow-down" width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0H8Z" fill="currentColor"/></svg></span></div></th>
+          <th onclick="sortTable(3)"><div class="col-head-inner">Package Type <span class="sort-icon"><svg class="arrow-up" width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0Z" fill="currentColor"/></svg><svg class="arrow-down" width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0H8Z" fill="currentColor"/></svg></span></div></th>
+          <th onclick="sortTable(4)"><div class="col-head-inner">Diamond Reg. Status <span class="sort-icon"><svg class="arrow-up" width="8" height="5" viewBox="0 0 8 5"><path d="M4 0L8 5H0Z" fill="currentColor"/></svg><svg class="arrow-down" width="8" height="5" viewBox="0 0 8 5"><path d="M4 5L0 0H8Z" fill="currentColor"/></svg></span></div></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="5"><div class="loading-overlay"><div class="spinner"></div><br>Loading data…</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pagination-bar">
+  <div class="rows-per-page">
+    Rows per page:
+    <select id="rowsPerPage" onchange="changeRowsPerPage()">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+  <div class="page-info" id="pageInfo">—</div>
+  <div class="page-nav">
+    <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>
+      <svg width="7" height="12" viewBox="0 0 7 12"><path d="M6 1L1 6L6 11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-btn" id="nextBtn" onclick="changePage(1)" disabled>
+      <svg width="7" height="12" viewBox="0 0 7 12"><path d="M1 1L6 6L1 11" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ① SET YOUR API URL HERE
+// ════════════════════════════════════════════════════════
+const API_URL = 'YOUR_API_ENDPOINT_HERE'; // e.g. 'http://localhost:8000/api/packages'
+
+// ════════════════════════════════════════════════════════
+// ② DROPDOWN OPTIONS — edit these lists directly
+// ════════════════════════════════════════════════════════
+const APP_CONFIG = {
+  default_platform: 'TIZEN_MAIN',
+  default_modelID:  'ALL',
+  default_localSet: 'ALL',
+
+  platforms: [
+    'TIZEN_MAIN',
+    'TIZEN_TEST',
+    'WEBOS_MAIN',
+    'WEBOS_TEST',
+    'ANDROID_MAIN',
+    'ANDROID_TEST',
+  ],
+
+  model_ids: [
+    'SM-T870',
+    'SM-X900',
+    'SM-G998B',
+    'SM-S918B',
+    'SM-F946B',
+    'SM-A546B',
+    'SM-N981B',
+  ],
+
+  country_codes: [
+    'US', 'KR', 'DE', 'FR', 'GB',
+    'JP', 'IN', 'AU', 'BR', 'CA',
+    'MX', 'SG',
+  ],
+};
+
+// ════════════════════════════════════════════════════════
+// ③ TEST DATA — shown when API_URL is not configured
+// ════════════════════════════════════════════════════════
+const TEST_DATA = [
+  {
+    id: 'PKG-00001',
+    platforms:  ['TIZEN_MAIN', 'WEBOS_MAIN'],
+    modelIDs:   ['SM-T870', 'SM-X900'],
+    localSets:  ['US', 'KR'],
+    rpmSpecName: 'com.samsung.netflix',
+    appId:       'APP001001',
+    placeHolder: 'false',
+    packageType: 'RPM',
+    diamondRegistrationStatus: 'Yes',
+  },
+  {
+    id: 'PKG-00002',
+    platforms:  ['TIZEN_TEST'],
+    modelIDs:   ['SM-G998B'],
+    localSets:  ['DE', 'FR'],
+    rpmSpecName: 'com.google.youtube',
+    appId:       'APP001002',
+    placeHolder: 'false',
+    packageType: 'APK',
+    diamondRegistrationStatus: 'No',
+  },
+  {
+    id: 'PKG-00003',
+    platforms:  ['ANDROID_MAIN', 'ANDROID_TEST'],
+    modelIDs:   ['SM-S918B', 'SM-F946B'],
+    localSets:  ['GB', 'AU'],
+    rpmSpecName: 'com.amazon.primevideo',
+    appId:       'APP001003',
+    placeHolder: 'true',
+    packageType: 'TPKG',
+    diamondRegistrationStatus: 'Yes',
+  },
+  {
+    id: 'PKG-00004',
+    platforms:  ['WEBOS_MAIN'],
+    modelIDs:   ['SM-A546B'],
+    localSets:  ['JP', 'IN'],
+    rpmSpecName: 'com.apple.tv',
+    appId:       'APP001004',
+    placeHolder: 'false',
+    packageType: 'IPK',
+    diamondRegistrationStatus: 'No',
+  },
+  {
+    id: 'PKG-00005',
+    platforms:  ['TIZEN_MAIN', 'TIZEN_TEST'],
+    modelIDs:   ['SM-N981B', 'SM-T870'],
+    localSets:  ['US', 'CA', 'MX'],
+    rpmSpecName: 'net.netflix.app',
+    appId:       'APP001005',
+    placeHolder: 'false',
+    packageType: 'RPM',
+    diamondRegistrationStatus: 'Yes',
+  },
+];
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let allData = [];        // raw from API
+let filteredData = [];   // after dropdown + text filters
+let currentPage = 1;
+let rowsPerPage = 10;
+let sortCol = -1;
+let sortDir = 'asc';
+const colFilters = ['', '', '', '', ''];
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+async function init() {
+  populateDropdowns(APP_CONFIG);
+
+  try {
+    allData = await fetchTableData();
+    document.getElementById('apiNotice').style.display = 'none';
+  } catch (e) {
+    allData = TEST_DATA;
+  }
+
+  document.getElementById('subtitleInfo').textContent =
+    `// ${allData.length.toLocaleString()} total records · live filter · sortable`;
+
+  applyAll();
+}
+
+async function fetchTableData() {
+  if (!API_URL || API_URL.startsWith('YOUR_')) throw new Error('no api url configured');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const r = await fetch(API_URL, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// DROPDOWNS
+// ════════════════════════════════════════════════════════
+function populateDropdowns(cfg) {
+  fillSelect('ddPlatform', cfg.platforms,     cfg.default_platform);
+  fillSelect('ddModel',    cfg.model_ids,     cfg.default_modelID);
+  fillSelect('ddLocalSet', cfg.country_codes, cfg.default_localSet);
+}
+
+function fillSelect(id, options, defaultVal) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = '<option value="ALL">All</option>' +
+    options.map(o => `<option value="${o}"${(defaultVal && defaultVal.toUpperCase() === o.toUpperCase()) ? ' selected' : ''}>${o}</option>`).join('');
+  // If default is ALL or not found, select All
+  if (!defaultVal || defaultVal.toUpperCase() === 'ALL') sel.value = 'ALL';
+}
+
+function onDropdownChange() { applyAll(); }
+
+// ════════════════════════════════════════════════════════
+// APPLY ALL FILTERS (dropdowns + text)
+// ════════════════════════════════════════════════════════
+function applyAll() {
+  const platform = document.getElementById('ddPlatform').value;
+  const model    = document.getElementById('ddModel').value;
+  const localSet = document.getElementById('ddLocalSet').value;
+
+  filteredData = allData.filter(row => {
+    // Dropdown filters
+    if (platform !== 'ALL' && !(row.platforms || []).includes(platform)) return false;
+    if (model    !== 'ALL' && !(row.modelIDs  || []).includes(model))    return false;
+    if (localSet !== 'ALL' && !(row.localSets || []).includes(localSet)) return false;
+
+    // Text column filters
+    const cols = getRowCols(row);
+    return colFilters.every((f, i) => !f || cols[i].toLowerCase().includes(f));
+  });
+
+  // Re-sort
+  if (sortCol >= 0) doSort(false);
+
+  currentPage = 1;
+  renderTable();
+}
+
+function applyFilters() {
+  const inputs = document.querySelectorAll('.filter-input');
+  inputs.forEach(inp => { colFilters[+inp.dataset.col] = inp.value.toLowerCase(); });
+  applyAll();
+}
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function getRowCols(row) {
+  return [
+    row.rpmSpecName || '',
+    row.appId       || '',
+    row.placeHolder || '',
+    row.packageType || '',
+    row.diamondRegistrationStatus || ''
+  ];
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const start = (currentPage - 1) * rowsPerPage;
+  const end   = Math.min(start + rowsPerPage, filteredData.length);
+  const page  = filteredData.slice(start, end);
+
+  if (page.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="no-results">No records match the current filters.</div></td></tr>`;
+  } else {
+    tbody.innerHTML = page.map(row => {
+      const cols = getRowCols(row);
+      return `<tr>
+        <td title="${cols[0]}">${cols[0]}</td>
+        <td>${cols[1]}</td>
+        <td>${cols[2]}</td>
+        <td>${cols[3]}</td>
+        <td>${cols[4] || '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  updatePagination(start, end);
+}
+
+function updatePagination(start, end) {
+  const total = filteredData.length;
+  document.getElementById('pageInfo').textContent =
+    total === 0 ? '0 of 0' : `${start + 1}–${end} of ${total.toLocaleString()}`;
+  document.getElementById('prevBtn').disabled = currentPage === 1;
+  document.getElementById('nextBtn').disabled = end >= total;
+}
+
+// ════════════════════════════════════════════════════════
+// SORTING
+// ════════════════════════════════════════════════════════
+function sortTable(col) {
+  const ths = document.querySelectorAll('thead th');
+  ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+  else { sortCol = col; sortDir = 'asc'; }
+  ths[col].classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+  doSort(true);
+}
+
+function doSort(render = true) {
+  filteredData.sort((a, b) => {
+    const va = getRowCols(a)[sortCol];
+    const vb = getRowCols(b)[sortCol];
+    return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  if (render) { currentPage = 1; renderTable(); }
+}
+
+// ════════════════════════════════════════════════════════
+// PAGINATION
+// ════════════════════════════════════════════════════════
+function changePage(dir) {
+  const maxPage = Math.ceil(filteredData.length / rowsPerPage);
+  currentPage = Math.max(1, Math.min(currentPage + dir, maxPage));
+  renderTable();
+}
+
+function changeRowsPerPage() {
+  rowsPerPage = +document.getElementById('rowsPerPage').value;
+  currentPage = 1;
+  renderTable();
+}
+
+// ════════════════════════════════════════════════════════
+// EXPORT
+// ════════════════════════════════════════════════════════
+function toggleExportMenu() {
+  document.getElementById('exportDropdown').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('exportBtn').contains(e.target))
+    document.getElementById('exportDropdown').classList.remove('open');
+});
+
+function exportData(type) {
+  document.getElementById('exportDropdown').classList.remove('open');
+
+  const headers = ['Package Name', 'App ID', 'Placeholder', 'Package Type', 'Diamond Reg. Status'];
+  const rows = filteredData.map(row => getRowCols(row));
+
+  if (type === 'csv') {
+    const csvRows = [headers, ...rows].map(r =>
+      r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+    download(`package-registry-${dateTag()}.csv`, 'text/csv', csvRows);
+
+  } else if (type === 'json') {
+    const jsonData = filteredData.map(row => ({
+      rpmSpecName:                row.rpmSpecName || '',
+      appId:                      row.appId || '',
+      placeHolder:                row.placeHolder || '',
+      packageType:                row.packageType || '',
+      diamondRegistrationStatus:  row.diamondRegistrationStatus || '',
+      platforms:                  row.platforms || [],
+      modelIDs:                   row.modelIDs || [],
+      localSets:                  row.localSets || [],
+    }));
+    download(`package-registry-${dateTag()}.json`, 'application/json', JSON.stringify(jsonData, null, 2));
+
+  } else if (type === 'xlsx') {
+    const wsData = [headers, ...rows];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    // Column widths
+    ws['!cols'] = [30,18,14,16,26].map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, ws, 'Packages');
+    XLSX.writeFile(wb, `package-registry-${dateTag()}.xlsx`);
+  } else {
+    // PDF via print-friendly window
+    const htmlRows = rows.map(r =>
+      `<tr>${r.map((c,i) => i===4 ? `<td><b>${c||'—'}</b></td>` : `<td>${c||'—'}</td>`).join('')}</tr>`
+    ).join('');
+
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><title>Package Registry Export</title>
+    <style>
+      body { font-family: Arial, sans-serif; font-size: 11px; padding: 20px; }
+      h2 { margin-bottom: 6px; } p { color:#777; font-size:10px; margin-bottom:16px; }
+      table { width:100%; border-collapse:collapse; }
+      th { background:#111; color:#fff; padding:8px 10px; text-align:left; font-size:10px; }
+      td { padding:7px 10px; border-bottom:1px solid #eee; font-size:10px; }
+      tr:nth-child(even) td { background:#fafafa; }
+      @media print { body { padding: 0; } }
+    </style></head><body>
+    <h2>Package Registry</h2>
+    <p>Exported ${new Date().toLocaleString()} · ${filteredData.length} records</p>
+    <table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${htmlRows}</tbody></table>
+    <script>window.onload=()=>{window.print();}<\/script>
+    </body></html>`);
+    win.document.close();
+  }
+}
+
+function download(filename, mime, content) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function dateTag() {
+  return new Date().toISOString().slice(0,10);
+}
+
+// ════════════════════════════════════════════════════════
+// ERROR
+// ════════════════════════════════════════════════════════
+function showError(msg) {
+  const el = document.getElementById('errorBanner');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('visible');
+}
+
+// ════════════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
+
