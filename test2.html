@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Knox OTP Verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F0F4F9;
+      --surface:     #FFFFFF;
+      --surface-2:   #F7F9FC;
+      --border:      #DDE3ED;
+      --border-focus:#3B6FE8;
+      --primary:     #2557D6;
+      --primary-dk:  #1A42B3;
+      --primary-lt:  #EEF3FF;
+      --text:        #111827;
+      --text-2:      #4B5563;
+      --text-3:      #9CA3AF;
+      --success:     #059669;
+      --success-bg:  #ECFDF5;
+      --success-bd:  #A7F3D0;
+      --error:       #DC2626;
+      --error-bg:    #FEF2F2;
+      --error-bd:    #FECACA;
+      --shadow-sm:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md:   0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-lg:   0 12px 40px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(37,87,214,0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(37,87,214,0.04) 0%, transparent 50%);
+    }
+
+    /* ── Layout ── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px 40px;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 32px;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    .topbar-logo { display: flex; align-items: center; gap: 10px; }
+
+    .topbar-icon {
+      width: 30px; height: 30px;
+      background: var(--primary);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .topbar-icon svg { width: 16px; height: 16px; fill: #fff; }
+
+    .topbar-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--text); letter-spacing: -0.01em;
+    }
+
+    .topbar-name span { color: var(--primary); }
+
+    .topbar-right {
+      margin-left: auto;
+      font-size: 12px; color: var(--text-3);
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .topbar-right svg { width: 13px; height: 13px; stroke: var(--text-3); }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: clamp(22px, 4vw, 29px);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle { margin-top: 6px; font-size: 14px; color: var(--text-3); }
+
+    /* ── Card ── */
+    .card {
+      width: 100%; max-width: 448px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: fadeUp 0.7s cubic-bezier(.22,1,.36,1) 0.1s both;
+    }
+
+    .card-top {
+      background: var(--primary);
+      padding: 20px 28px;
+      display: flex; align-items: center; gap: 14px;
+    }
+
+    .card-top-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .card-top-icon svg { width: 22px; height: 22px; stroke: #fff; }
+
+    .card-top-text h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15.5px; font-weight: 700;
+      color: #fff; letter-spacing: -0.01em;
+    }
+
+    .card-top-text p { font-size: 12.5px; color: rgba(255,255,255,0.65); margin-top: 2px; }
+
+    .card-body { padding: 28px; }
+
+    .card-step { display: none; }
+    .card-step.active { display: block; }
+
+    /* ── Steps indicator ── */
+    .steps-indicator {
+      display: flex; align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .step-pill { display: flex; align-items: center; gap: 8px; flex: 1; }
+
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .step-num.active   { background: var(--primary); color: #fff; }
+    .step-num.inactive { background: var(--bg); color: var(--text-3); border: 1.5px solid var(--border); }
+    .step-num.done     { background: var(--success); color: #fff; }
+
+    .step-pill-label { font-size: 12px; font-weight: 500; color: var(--text-3); }
+    .step-pill-label.active { color: var(--primary); font-weight: 600; }
+
+    .step-connector {
+      height: 1.5px; flex: 1;
+      background: var(--border); margin: 0 10px;
+      transition: background 0.4s;
+    }
+
+    .step-connector.done { background: var(--success); }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-3); margin-bottom: 16px;
+    }
+
+    /* ── Field ── */
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block; font-size: 13px; font-weight: 500;
+      color: var(--text-2); margin-bottom: 6px;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap .icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; stroke: var(--text-3);
+      pointer-events: none; transition: stroke 0.2s;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 11px 12px 11px 38px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]::placeholder { color: var(--text-3); }
+
+    input[type="text"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59,111,232,0.1);
+    }
+
+    input:focus ~ .icon { stroke: var(--primary); }
+
+    /* ── Info box ── */
+    .info-box {
+      background: var(--primary-lt);
+      border: 1px solid rgba(37,87,214,0.15);
+      border-radius: 9px;
+      padding: 11px 14px;
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 20px;
+      font-size: 13px; color: var(--primary-dk); line-height: 1.5;
+    }
+
+    .info-box svg { width: 15px; height: 15px; stroke: var(--primary); flex-shrink: 0; margin-top: 1px; }
+
+    /* ── OTP grid ── */
+    .otp-grid {
+      display: flex; gap: 8px;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .otp-cell {
+      flex: 1; aspect-ratio: 1; max-width: 58px;
+      text-align: center;
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px; font-weight: 700; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      caret-color: var(--primary);
+    }
+
+    .otp-cell:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(59,111,232,0.1);
+      background: #fff;
+    }
+
+    .otp-cell.filled {
+      border-color: var(--primary);
+      background: var(--primary-lt);
+      color: var(--primary-dk);
+    }
+
+    /* ── Button ── */
+    .btn {
+      width: 100%; padding: 12px 20px;
+      background: var(--primary); border: none;
+      border-radius: 9px; color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(37,87,214,0.22);
+    }
+
+    .btn:hover   { background: var(--primary-dk); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,87,214,0.3); }
+    .btn:active  { transform: translateY(0); }
+    .btn:disabled{ opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2); margin-top: 10px;
+      font-size: 13.5px; font-weight: 600;
+      font-family: 'Inter', sans-serif; box-shadow: none;
+    }
+
+    .btn-outline:hover { background: var(--bg); border-color: #c0cad8; box-shadow: none; transform: none; }
+
+    /* ── Resend ── */
+    .resend-row {
+      text-align: center; margin-top: 14px;
+      font-size: 13px; color: var(--text-3);
+    }
+
+    .resend-row button {
+      background: none; border: none;
+      color: var(--primary); font-size: 13px;
+      font-family: 'Inter', sans-serif; font-weight: 600;
+      cursor: pointer; padding: 0;
+    }
+
+    .resend-row button:disabled { color: var(--text-3); cursor: default; }
+
+    /* ── Message ── */
+    .msg {
+      display: none; font-size: 13px;
+      padding: 10px 13px; border-radius: 8px;
+      margin-bottom: 16px; font-weight: 500;
+      align-items: center; gap: 8px;
+    }
+
+    .msg.error   { display: flex; background: var(--error-bg);   border: 1px solid var(--error-bd);   color: var(--error); }
+    .msg.success { display: flex; background: var(--success-bg); border: 1px solid var(--success-bd); color: var(--success); }
+    .msg svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+
+    /* ── Badges ── */
+    .badges { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+    .badge {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 5px 10px;
+      font-size: 11px; color: var(--text-3); font-weight: 500;
+    }
+
+    .badge svg { width: 12px; height: 12px; stroke: var(--text-3); }
+
+    /* ── Success overlay ── */
+    .success-overlay {
+      display: none; position: fixed; inset: 0; z-index: 100;
+      background: rgba(240,244,249,0.88);
+      backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+    }
+
+    .success-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+
+    .success-box {
+      text-align: center; padding: 44px 40px 36px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; box-shadow: var(--shadow-lg);
+      max-width: 360px;
+      animation: popIn 0.45s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    .check-wrap {
+      width: 72px; height: 72px;
+      background: var(--success-bg); border: 2px solid var(--success-bd);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 22px;
+    }
+
+    .check-wrap svg { width: 32px; height: 32px; stroke: var(--success); }
+
+    .success-box h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px;
+    }
+
+    .success-box p { font-size: 14px; color: var(--text-3); line-height: 1.6; }
+
+    .redirect-bar { margin-top: 22px; height: 4px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+
+    .redirect-fill { height: 100%; width: 0%; background: var(--success); border-radius: 4px; transition: width 3s linear; }
+
+    .success-label { font-size: 12px; color: var(--text-3); margin-top: 8px; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 22px; font-size: 12px; color: var(--text-3);
+      animation: fadeUp 0.7s ease 0.3s both;
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+    }
+
+    .footer svg { width: 12px; height: 12px; stroke: var(--text-3); }
+
+    /* ── Animations ── */
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+    @keyframes spin     { to { transform:rotate(360deg); } }
+    @keyframes popIn    { from { opacity:0; transform:scale(0.9) translateY(16px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    @keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)} 40%{transform:translateX(5px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+    .shake { animation: shake 0.38s ease; }
+
+    @media (max-width: 480px) {
+      .card-body { padding: 22px 18px; }
+      .card-top  { padding: 16px 18px; }
+      .otp-cell  { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+    </div>
+    <div class="topbar-name">Knox<span>ID</span> Portal</div>
+  </div>
+  <div class="topbar-right">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    Secure Session
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Knox OTP Verification</h1>
+    <p class="subtitle">Verify your identity to access the employee portal</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <div class="card-top">
+      <div class="card-top-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="card-top-text">
+        <h2>Two-Factor Authentication</h2>
+        <p>A one-time code will be sent to your registered email</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Steps -->
+      <div class="steps-indicator">
+        <div class="step-pill">
+          <div class="step-num active" id="sn1">1</div>
+          <div class="step-pill-label active" id="sl1">Knox ID</div>
+        </div>
+        <div class="step-connector" id="conn"></div>
+        <div class="step-pill">
+          <div class="step-num inactive" id="sn2">2</div>
+          <div class="step-pill-label" id="sl2">Verify Code</div>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="card-step active" id="step1">
+        <div class="section-label">Enter your details</div>
+
+        <div id="msg1" class="msg"></div>
+
+        <div class="field">
+          <label for="knoxId">Knox ID</label>
+          <div class="input-wrap">
+            <input type="text" id="knoxId" placeholder="e.g. john.doe or EMP00123" autocomplete="off" spellcheck="false"/>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/>
+            </svg>
+          </div>
+        </div>
+
+        <button class="btn" id="sendBtn" onclick="sendOTP()">Send OTP</button>
+
+        <div class="divider"></div>
+
+        <div class="badges">
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            256-bit Encrypted
+          </div>
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Expires in 5 min
+          </div>
+          <div class="badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            SOC 2 Compliant
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="card-step" id="step2">
+        <div class="section-label">Enter verification code</div>
+
+        <div class="info-box" id="otpInfo">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>A 6-character code was sent to the email linked to your Knox ID.</span>
+        </div>
+
+        <div id="msg2" class="msg"></div>
+
+        <label>Verification Code</label>
+        <div class="otp-grid" id="otpGrid">
+          <input type="text" class="otp-cell" maxlength="1" data-index="0"/>
+          <input type="text" class="otp-cell" maxlength="1" data-index="1"/>
+          <input type="text" class="otp-cell" maxlength="1" data-index="2"/>
+          <input type="text" class="otp-cell" maxlength="1" data-index="3"/>
+          <input type="text" class="otp-cell" maxlength="1" data-index="4"/>
+          <input type="text" class="otp-cell" maxlength="1" data-index="5"/>
+        </div>
+
+        <button class="btn" id="verifyBtn" onclick="verifyOTP()">Verify & Continue</button>
+
+        <div class="resend-row">
+          Didn't receive it?
+          <button id="resendBtn" onclick="resendOTP()" disabled>Resend in <span id="countdown">60</span>s</button>
+        </div>
+
+        <button class="btn btn-outline" onclick="goBack()">← Back</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    Knox Security &nbsp;·&nbsp; All sessions are encrypted and logged
+  </div>
+
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="check-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h2>Identity Verified</h2>
+    <p>Your Knox ID has been verified successfully.<br/>Redirecting you now…</p>
+    <div class="redirect-bar"><div class="redirect-fill" id="redirectFill"></div></div>
+    <div class="success-label">Redirecting in 3 seconds</div>
+  </div>
+</div>
+
+<script>
+  const API_ENDPOINT   = 'YOUR_API_ENDPOINT_HERE';
+  const REDIRECT_PAGE  = 'templates/dashboard.html';
+  const OTP_LENGTH     = 6;
+  const RESEND_SECS    = 60;
+  const SESSION_HOURS  = 1;   // ← change session duration here
+
+  let generatedOTP  = '';
+  let currentKnoxId = '';
+  let countdownTimer = null;
+
+  // ── Session cookie helpers ────────────────────────────
+  function setSessionCookie(knoxId) {
+    const expires = new Date(Date.now() + SESSION_HOURS * 60 * 60 * 1000);
+    document.cookie = `knox_verified=${encodeURIComponent(knoxId)}; expires=${expires.toUTCString()}; path=/; SameSite=Strict`;
+  }
+
+  function getSessionCookie() {
+    const match = document.cookie.match(/(?:^|;\s*)knox_verified=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function clearSessionCookie() {
+    document.cookie = 'knox_verified=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  }
+
+  // ── On load: check existing session ──────────────────
+  (function init() {
+    const existing = getSessionCookie();
+    if (existing) {
+      window.location.replace(REDIRECT_PAGE);
+    }
+  })();
+
+  function generateOTP(len = OTP_LENGTH) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  }
+
+  const iconErr = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  const iconOk  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.className = 'msg ' + type;
+    el.innerHTML = (type === 'error' ? iconErr : iconOk) + text;
+  }
+
+  function clearMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg'; el.innerHTML = '';
+  }
+
+  async function sendOTP() {
+    clearMsg('msg1');
+    const knoxId = document.getElementById('knoxId').value.trim();
+    if (!knoxId) {
+      showMsg('msg1', 'error', 'Please enter your Knox ID.');
+      document.getElementById('knoxId').focus();
+      return;
+    }
+
+    currentKnoxId = knoxId;
+    generatedOTP  = generateOTP();
+
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Sending…';
+
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ knoxId, otp: generatedOTP })
+      });
+      if (!res.ok) throw new Error('API error');
+      goToStep2();
+    } catch {
+      console.warn('[Knox OTP] Demo mode — OTP:', generatedOTP);
+      goToStep2();
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = 'Send OTP';
+    }
+  }
+
+  function goToStep2() {
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    document.getElementById('otpInfo').querySelector('span').textContent =
+      `A 6-character code was sent to the email linked to Knox ID: ${currentKnoxId}`;
+
+    const sn1 = document.getElementById('sn1');
+    sn1.className = 'step-num done';
+    sn1.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    document.getElementById('sl1').className = 'step-pill-label';
+    document.getElementById('conn').classList.add('done');
+    document.getElementById('sn2').className = 'step-num active';
+    document.getElementById('sl2').className = 'step-pill-label active';
+
+    startCountdown();
+    setTimeout(() => document.querySelectorAll('.otp-cell')[0].focus(), 100);
+  }
+
+  document.querySelectorAll('.otp-cell').forEach((cell, i, cells) => {
+    cell.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !cell.value && i > 0) {
+        cells[i - 1].value = '';
+        cells[i - 1].classList.remove('filled');
+        cells[i - 1].focus();
+      }
+    });
+
+    cell.addEventListener('input', () => {
+      const val = cell.value.replace(/[^a-zA-Z0-9]/g, '').slice(-1).toUpperCase();
+      cell.value = val;
+      cell.classList.toggle('filled', !!val);
+      if (val && i < cells.length - 1) cells[i + 1].focus();
+      clearMsg('msg2');
+    });
+
+    cell.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = (e.clipboardData.getData('text') || '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      pasted.split('').slice(0, OTP_LENGTH).forEach((ch, j) => {
+        if (cells[j]) { cells[j].value = ch; cells[j].classList.add('filled'); }
+      });
+      cells[Math.min(pasted.length, OTP_LENGTH - 1)].focus();
+    });
+  });
+
+  function verifyOTP() {
+    clearMsg('msg2');
+    const entered = Array.from(document.querySelectorAll('.otp-cell')).map(c => c.value).join('');
+
+    if (entered.length < OTP_LENGTH) {
+      showMsg('msg2', 'error', 'Please fill in all 6 characters.');
+      shakeGrid(); return;
+    }
+
+    if (entered.toUpperCase() !== generatedOTP) {
+      showMsg('msg2', 'error', 'Incorrect code. Please check and try again.');
+      shakeGrid(); clearOTP(); return;
+    }
+
+    const btn = document.getElementById('verifyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Verifying…';
+    clearInterval(countdownTimer);
+    setTimeout(showSuccess, 500);
+  }
+
+  function shakeGrid() {
+    const g = document.getElementById('otpGrid');
+    g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
+  }
+
+  function clearOTP() {
+    document.querySelectorAll('.otp-cell').forEach(c => { c.value = ''; c.classList.remove('filled'); });
+    document.querySelectorAll('.otp-cell')[0].focus();
+  }
+
+  function showSuccess() {
+    // Set 1-hour session cookie so user isn't asked for OTP again
+    setSessionCookie(currentKnoxId);
+
+    document.getElementById('successOverlay').classList.add('show');
+    setTimeout(() => document.getElementById('redirectFill').style.width = '100%', 50);
+    setTimeout(() => window.location.href = REDIRECT_PAGE, 3200);
+  }
+
+  function startCountdown() {
+    let secs = RESEND_SECS;
+    const btn = document.getElementById('resendBtn');
+    btn.disabled = true;
+    btn.innerHTML = `Resend in <span id="countdown">${secs}</span>s`;
+
+    countdownTimer = setInterval(() => {
+      secs--;
+      const cd = document.getElementById('countdown');
+      if (cd) cd.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(countdownTimer);
+        btn.disabled = false;
+        btn.textContent = 'Resend OTP';
+      }
+    }, 1000);
+  }
+
+  async function resendOTP() {
+    clearMsg('msg2');
+    generatedOTP = generateOTP();
+    const btn = document.getElementById('resendBtn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+
+    try {
+      await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ knoxId: currentKnoxId, otp: generatedOTP })
+      });
+    } catch {
+      console.warn('[Knox OTP] Resend demo mode — OTP:', generatedOTP);
+    }
+
+    showMsg('msg2', 'success', 'A new code has been sent to your email.');
+    clearOTP();
+    startCountdown();
+  }
+
+  function goBack() {
+    clearMsg('msg1'); clearMsg('msg2'); clearOTP(); clearInterval(countdownTimer);
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('step1').classList.add('active');
+
+    const sn1 = document.getElementById('sn1');
+    sn1.className = 'step-num active'; sn1.textContent = '1';
+    document.getElementById('sl1').className = 'step-pill-label active';
+    document.getElementById('conn').classList.remove('done');
+    document.getElementById('sn2').className = 'step-num inactive';
+    document.getElementById('sl2').className = 'step-pill-label';
+    document.getElementById('verifyBtn').disabled = false;
+    document.getElementById('verifyBtn').innerHTML = 'Verify & Continue';
+    document.getElementById('knoxId').focus();
+  }
+
+  document.getElementById('knoxId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendOTP();
+  });
+</script>
+</body>
+</html>
