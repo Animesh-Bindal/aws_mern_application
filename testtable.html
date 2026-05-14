@@ -5,78 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Review Report</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-      font-family: 'Courier New', Courier, monospace;
-      padding: 36px 24px;
-      color: #f1f5f9;
+      background: #f0f4f8;
+      font-family: 'Inter', sans-serif;
+      padding: 36px 28px;
+      color: #1e293b;
     }
 
     /* ── Header ── */
-    .header { margin-bottom: 28px; }
+    .header { margin-bottom: 24px; }
 
     .header-label {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
+      gap: 8px;
+      margin-bottom: 5px;
     }
 
     .dot {
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
-      background: #22d3ee;
-      box-shadow: 0 0 8px #22d3ee;
+      background: #3b82f6;
       flex-shrink: 0;
     }
 
     .label-text {
-      color: #94a3b8;
+      color: #64748b;
       font-size: 11px;
-      letter-spacing: 0.15em;
+      font-weight: 600;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
     }
 
     .sheet-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      color: #f1f5f9;
+      color: #0f172a;
+      letter-spacing: 0.01em;
     }
 
     /* ── Card ── */
     .card {
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+      box-shadow: 0 4px 24px rgba(15,23,42,0.07), 0 1px 4px rgba(15,23,42,0.04);
     }
 
     /* ── Pre-header info bar ── */
     .info-bar {
-      background: rgba(15, 23, 42, 0.6);
-      border-bottom: 1px solid rgba(148,163,184,0.1);
-      padding: 14px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 13px 24px;
       display: flex;
       flex-wrap: wrap;
-      gap: 28px;
+      gap: 32px;
     }
 
     .info-item { display: flex; align-items: center; gap: 8px; }
 
     .info-key {
-      color: #64748b;
-      font-size: 11px;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
 
     .info-val {
-      color: #22d3ee;
+      color: #2563eb;
       font-size: 13px;
       font-weight: 600;
     }
@@ -84,59 +87,55 @@
     /* ── Table wrapper ── */
     .table-wrap { overflow-x: auto; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
     /* ── Column headers ── */
     thead th {
-      padding: 12px 20px;
+      padding: 11px 20px;
       text-align: left;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #94a3b8;
-      background: rgba(15, 23, 42, 0.4);
-      border-bottom: 1px solid rgba(148,163,184,0.1);
-      border-right: 1px solid rgba(148,163,184,0.06);
+      color: #64748b;
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #e9eef4;
       white-space: nowrap;
     }
 
     thead th:last-child { border-right: none; }
 
     /* ── Body rows ── */
-    tbody tr {
-      transition: background 0.15s;
-      cursor: default;
-    }
+    tbody tr { transition: background 0.12s; cursor: default; }
 
-    tbody tr.row-even  { background: transparent; }
-    tbody tr.row-odd   { background: rgba(255,255,255,0.02); }
-    tbody tr.row-highlight { background: rgba(234,179,8,0.07); }
+    tbody tr.row-even      { background: #ffffff; }
+    tbody tr.row-odd       { background: #f8fafc; }
+    tbody tr.row-highlight { background: #fffbeb; }
+    tbody tr.row-fail      { background: #fff5f5; }
 
     tbody tr.row-even:hover,
-    tbody tr.row-odd:hover  { background: rgba(34,211,238,0.05); }
-    tbody tr.row-highlight:hover { background: rgba(234,179,8,0.14); }
+    tbody tr.row-odd:hover       { background: #eff6ff; }
+    tbody tr.row-highlight:hover { background: #fef3c7; }
+    tbody tr.row-fail:hover      { background: #fee2e2; }
 
     tbody td {
-      padding: 13px 20px;
+      padding: 12px 20px;
       font-size: 13px;
-      border-bottom: 1px solid rgba(148,163,184,0.07);
-      border-right: 1px solid rgba(148,163,184,0.06);
-      color: #475569;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      color: #64748b;
     }
 
     tbody td:last-child { border-right: none; }
 
     /* cell roles */
-    td.cell-key         { color: #cbd5e1; font-weight: 600; }
-    td.cell-key-hl      { color: #fbbf24; font-weight: 600; }
-    td.cell-val         { color: #f1f5f9; font-weight: 500; }
-    td.cell-empty       { color: #334155; }
+    td.cell-key    { color: #475569; font-weight: 600; }
+    td.cell-key-hl { color: #b45309; font-weight: 600; }
+    td.cell-val    { color: #0f172a; font-weight: 500; }
+    td.cell-empty  { color: #cbd5e1; }
 
-    .hl-arrow { color: #fbbf24; font-size: 10px; margin-right: 6px; }
+    .hl-arrow { color: #d97706; font-size: 10px; margin-right: 5px; }
 
     /* ── Result badge ── */
     .badge {
@@ -147,28 +146,29 @@
       border-radius: 20px;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
     .badge-pass {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #6ee7b7;
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #86efac;
     }
 
     .badge-fail {
       background: #fee2e2;
-      color: #991b1b;
+      color: #b91c1c;
       border: 1px solid #fca5a5;
     }
 
-    .dash { color: #334155; }
+    .dash { color: #cbd5e1; }
 
     /* ── Footer ── */
     .footer {
-      padding: 12px 24px;
-      border-top: 1px solid rgba(148,163,184,0.1);
+      padding: 11px 24px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -176,13 +176,12 @@
       gap: 8px;
     }
 
-    .footer-meta { color: #475569; font-size: 11px; }
-
-    .footer-stats { display: flex; gap: 18px; }
-
-    .footer-stat { color: #475569; font-size: 11px; }
-    .stat-cyan    { color: #22d3ee; font-weight: 700; }
-    .stat-yellow  { color: #fbbf24; font-weight: 700; }
+    .footer-meta  { color: #94a3b8; font-size: 11px; }
+    .footer-stats { display: flex; gap: 20px; }
+    .footer-stat  { color: #64748b; font-size: 11px; font-weight: 500; }
+    .stat-blue    { color: #2563eb; font-weight: 700; }
+    .stat-amber   { color: #d97706; font-weight: 700; }
+    .stat-red     { color: #dc2626; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -232,6 +231,7 @@
           { type: "normal",    data: ["EDID change : ",    "Yes",                     "", "", "", "pass"] },
           { type: "normal",    data: ["Otn only : ",       "N",                       "", "", "", "pass"] },
           { type: "normal",    data: ["Usb upgrade : ",    "Y",                       "", "", "", "pass"] },
+          { type: "normal",    data: ["Build check : ",    "Failed",                  "", "", "", "not okay"] },
           { type: "Highlight", data: ["Otn only : ",       "N",                       "", "", "", "pass"] },
         ],
       },
@@ -274,8 +274,14 @@
     const lastIdx = sheet.columns.length - 1;
 
     sheet.Rows.forEach((row, rowIdx) => {
-      const isHL = row.type === "Highlight";
-      let rowClass = isHL ? "row-highlight" : (rowIdx % 2 === 0 ? "row-even" : "row-odd");
+      const isHL   = row.type === "Highlight";
+      const result = (row.data[lastIdx] || "").toLowerCase();
+      const isFail = result === "not okay" || result === "fail";
+
+      let rowClass;
+      if (isHL)        rowClass = "row-highlight";
+      else if (isFail) rowClass = "row-fail";
+      else             rowClass = rowIdx % 2 === 0 ? "row-even" : "row-odd";
 
       const cells = row.data.map((cell, ci) => {
         // Last column → badge
@@ -302,13 +308,15 @@
     // Footer
     const passCount = sheet.Rows.filter(r => r.data[lastIdx]?.toLowerCase() === "pass").length;
     const hlCount   = sheet.Rows.filter(r => r.type === "Highlight").length;
+    const failCount = sheet.Rows.filter(r => ["not okay","fail"].includes(r.data[lastIdx]?.toLowerCase())).length;
 
     document.getElementById("footerMeta").textContent =
       `${sheet.Rows.length} rows · ${sheet.columns.length} columns`;
 
     document.getElementById("footerStats").innerHTML = `
-      <span class="footer-stat"><span class="stat-cyan">${passCount}</span> passed</span>
-      <span class="footer-stat"><span class="stat-yellow">${hlCount}</span> highlighted</span>`;
+      <span class="footer-stat"><span class="stat-blue">${passCount}</span> passed</span>
+      ${failCount ? `<span class="footer-stat"><span class="stat-red">${failCount}</span> not okay</span>` : ""}
+      <span class="footer-stat"><span class="stat-amber">${hlCount}</span> highlighted</span>`;
   }
 
   render();
