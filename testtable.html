@@ -1,106 +1,440 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Review Report</title>
+  <title>Gmap Data Table</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
       background: #f0f4f8;
       font-family: 'Inter', sans-serif;
-      padding: 36px 28px;
       color: #1e293b;
     }
 
-    /* ── Header ── */
-    .header { margin-bottom: 24px; }
-
-    .header-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 5px;
+    /* ── Page title ── */
+    .page-title {
+      text-align: center;
+      padding: 20px 0 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.05em;
     }
 
-    .dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #3b82f6;
+    /* ── Main content ── */
+    .content {
+      padding: 4px 32px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── Sheet block ── */
+    .sheet-block {
+      margin-bottom: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.05);
+      background: #fff;
+    }
+
+    /* ── Accordion header row ── */
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: #fff;
+      gap: 12px;
+    }
+
+    .sheet-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       flex-shrink: 0;
     }
 
-    .label-text {
-      color: #64748b;
+    /* pass/fail pill — non-clickable */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    .sheet-title {
-      font-size: 20px;
       font-weight: 700;
-      color: #0f172a;
-      letter-spacing: 0.01em;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      pointer-events: none;
+      user-select: none;
     }
 
-    /* ── Card ── */
-    .card {
-      background: #ffffff;
+    .status-pass { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .status-fail { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    /* dropdown toggle button */
+    .toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 13px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #475569;
+      background: #f1f5f9;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(15,23,42,0.07), 0 1px 4px rgba(15,23,42,0.04);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
     }
 
-    /* ── Pre-header info bar ── */
+    .toggle-btn:hover { background: #e2e8f0; color: #1e293b; }
+
+    .toggle-btn .arrow {
+      font-size: 11px;
+      display: inline-block;
+      transition: transform 0.22s ease;
+    }
+
+    /* ── Collapsible body ── */
+    .sheet-body {
+      display: none;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .sheet-body.open { display: block; }
+
+    /* ── Info bar ── */
     .info-bar {
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
-      padding: 13px 24px;
+      padding: 11px 20px;
       display: flex;
       flex-wrap: wrap;
-      gap: 32px;
+      gap: 28px;
     }
 
-    .info-item { display: flex; align-items: center; gap: 8px; }
+    .info-item { display: flex; align-items: center; gap: 7px; }
 
     .info-key {
       color: #94a3b8;
       font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
     }
 
     .info-val {
       color: #2563eb;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
     }
 
-    /* ── Table wrapper ── */
+    /* ── Table ── */
     .table-wrap { overflow-x: auto; }
 
     table { width: 100%; border-collapse: collapse; }
 
-    /* ── Column headers ── */
     thead th {
-      padding: 11px 20px;
+      padding: 10px 18px;
       text-align: left;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: #64748b;
       background: #f1f5f9;
       border-bottom: 1px solid #e2e8f0;
       border-right: 1px solid #e9eef4;
+      white-space: nowrap;
+    }
+
+    thead th:last-child { border-right: none; }
+
+    tbody tr { transition: background 0.12s; cursor: default; }
+
+    tbody tr.row-even      { background: #ffffff; }
+    tbody tr.row-odd       { background: #f8fafc; }
+    tbody tr.row-highlight { background: #fffbeb; }
+    tbody tr.row-fail      { background: #fff5f5; }
+
+    tbody tr.row-even:hover,
+    tbody tr.row-odd:hover       { background: #eff6ff; }
+    tbody tr.row-highlight:hover { background: #fef3c7; }
+    tbody tr.row-fail:hover      { background: #fee2e2; }
+
+    tbody td {
+      padding: 11px 18px;
+      font-size: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f1f5f9;
+      color: #64748b;
+    }
+
+    tbody td:last-child { border-right: none; }
+
+    td.cell-key    { color: #475569; font-weight: 600; }
+    td.cell-key-hl { color: #b45309; font-weight: 600; }
+    td.cell-val    { color: #0f172a; font-weight: 500; }
+    td.cell-empty  { color: #e2e8f0; }
+
+    .hl-arrow { color: #d97706; font-size: 9px; margin-right: 4px; }
+
+    /* ── Row result badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-pass { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-fail { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+    .dash { color: #e2e8f0; }
+
+    /* ── Sheet footer ── */
+    .sheet-footer {
+      padding: 9px 20px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .footer-meta  { color: #94a3b8; font-size: 11px; }
+    .footer-stats { display: flex; gap: 16px; }
+    .footer-stat  { color: #64748b; font-size: 11px; font-weight: 500; }
+    .stat-blue    { color: #2563eb; font-weight: 700; }
+    .stat-amber   { color: #d97706; font-weight: 700; }
+    .stat-red     { color: #dc2626; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">Gmap Data Table</div>
+  <div class="content" id="content"></div>
+
+<script>
+  // ── Critical fields — if any of these are "not okay", the sheet is FAIL ──
+  const CRITICAL_FIELDS = [
+    "version name",
+    "version number",
+    "checksum",
+    "sub otp version name",
+    "sub otp version number",
+    "otp unzipped",
+    "usb unzipped",
+    "otn unzipped",
+    "swrest unzipped",
+    "mom unzipped",
+    "epop unzipped"
+  ];
+
+  // ── Your JSON data — add as many sheets objects as needed ──
+  const allSheets = [
+    {
+      name: "Q4KS95@T-RSMFAKUC-0090",
+      pre_header_rows: [
+        { type: "normal", data: ["chipset : ", "T-RSMFAKUC", "", "", "", ""] },
+        { type: "normal", data: ["model : ",   "Q4KS95",     "", "", "", ""] }
+      ],
+      columns: ["review requisites", "review details", "gmap (size)", "server (size)/contents", "from packages", "result"],
+      rows: [
+        { type: "normal",    data: ["version name : ",         "Q4KS95@T-RSMFAKUC-0090", "", "", "", "pass"] },
+        { type: "normal",    data: ["version number : ",       "1296.8",                  "", "", "", "pass"] },
+        { type: "normal",    data: ["edid change : ",          "yes",                     "", "", "", "pass"] },
+        { type: "normal",    data: ["otn only : ",             "N",                       "", "", "", "pass"] },
+        { type: "normal",    data: ["usb upgrade : ",          "Y",                       "", "", "", "pass"] },
+        { type: "normal",    data: ["checksum : ",             "verified",                "", "", "", "pass"] },
+        { type: "normal",    data: ["otp unzipped : ",         "ok",                      "", "", "", "pass"] },
+        { type: "normal",    data: ["usb unzipped : ",         "ok",                      "", "", "", "pass"] },
+        { type: "normal",    data: ["otn unzipped : ",         "ok",                      "", "", "", "pass"] },
+        { type: "highlight", data: ["build check : ",          "failed",                  "", "", "", "not okay"] }
+      ]
+    },
+    {
+      name: "Q4KS96@T-RSMFAKUC-0091",
+      pre_header_rows: [
+        { type: "normal", data: ["chipset : ", "T-RSMFAKUC", "", "", "", ""] },
+        { type: "normal", data: ["model : ",   "Q4KS96",     "", "", "", ""] }
+      ],
+      columns: ["review requisites", "review details", "gmap (size)", "server (size)/contents", "from packages", "result"],
+      rows: [
+        { type: "normal", data: ["version name : ",         "Q4KS96@T-RSMFAKUC-0091", "", "", "", "pass"] },
+        { type: "normal", data: ["version number : ",       "1297.0",                  "", "", "", "not okay"] },
+        { type: "normal", data: ["checksum : ",             "mismatch",                "", "", "", "not okay"] },
+        { type: "normal", data: ["sub otp version name : ", "SUB-091",                 "", "", "", "pass"] },
+        { type: "normal", data: ["otp unzipped : ",         "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["usb unzipped : ",         "corrupted",               "", "", "", "not okay"] }
+      ]
+    },
+    {
+      name: "Q4KS97@T-RSMFAKXY-0092",
+      pre_header_rows: [
+        { type: "normal", data: ["chipset : ", "T-RSMFAKXY", "", "", "", ""] },
+        { type: "normal", data: ["model : ",   "Q4KS97",     "", "", "", ""] }
+      ],
+      columns: ["review requisites", "review details", "gmap (size)", "server (size)/contents", "from packages", "result"],
+      rows: [
+        { type: "normal", data: ["version name : ",    "Q4KS97@T-RSMFAKXY-0092", "", "", "", "pass"] },
+        { type: "normal", data: ["version number : ",  "1298.1",                  "", "", "", "pass"] },
+        { type: "normal", data: ["checksum : ",        "verified",                "", "", "", "pass"] },
+        { type: "normal", data: ["otp unzipped : ",    "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["usb unzipped : ",    "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["otn unzipped : ",    "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["swrest unzipped : ", "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["mom unzipped : ",    "ok",                      "", "", "", "pass"] },
+        { type: "normal", data: ["epop unzipped : ",   "ok",                      "", "", "", "pass"] }
+      ]
+    }
+  ];
+
+  // ── Helpers ──
+  function normaliseKey(raw) {
+    return (raw || "").replace(/\s*:\s*$/, "").trim().toLowerCase();
+  }
+
+  function isNotOkay(val) {
+    const v = (val || "").toLowerCase();
+    return v === "not okay" || v === "fail" || v === "failed";
+  }
+
+  function sheetStatus(sheet) {
+    const lastIdx = sheet.columns.length - 1;
+    for (const row of sheet.rows) {
+      const key    = normaliseKey(row.data[0]);
+      const result = row.data[lastIdx] || "";
+      if (CRITICAL_FIELDS.includes(key) && isNotOkay(result)) return "fail";
+    }
+    return "pass";
+  }
+
+  function makeBadge(value) {
+    if (!value) return '<span class="dash">—</span>';
+    const fail = isNotOkay(value);
+    return `<span class="badge ${fail ? "badge-fail" : "badge-pass"}">${fail ? "✗" : "✓"} ${value}</span>`;
+  }
+
+  // ── Toggle ──
+  function toggleSheet(bodyId, btnId) {
+    const body  = document.getElementById(bodyId);
+    const btn   = document.getElementById(btnId);
+    const open  = body.classList.toggle("open");
+    btn.querySelector(".arrow").style.transform = open ? "rotate(180deg)" : "rotate(0deg)";
+  }
+
+  // ── Render ──
+  function renderAll() {
+    const container = document.getElementById("content");
+
+    allSheets.forEach((sheet, idx) => {
+      const status   = sheetStatus(sheet);
+      const lastIdx  = sheet.columns.length - 1;
+      const passCount = sheet.rows.filter(r => !isNotOkay(r.data[lastIdx])).length;
+      const failCount = sheet.rows.filter(r =>  isNotOkay(r.data[lastIdx])).length;
+      const hlCount   = sheet.rows.filter(r => r.type === "highlight").length;
+      const bodyId    = `body-${idx}`;
+      const btnId     = `btn-${idx}`;
+
+      // info bar
+      const infoHtml = sheet.pre_header_rows.map(row => `
+        <div class="info-item">
+          <span class="info-key">${normaliseKey(row.data[0])}</span>
+          <span class="info-val">${row.data[1]}</span>
+        </div>`).join("");
+
+      // thead
+      const thHtml = sheet.columns.map(c => `<th>${c}</th>`).join("");
+
+      // tbody
+      const trHtml = sheet.rows.map((row, ri) => {
+        const isHL  = row.type === "highlight";
+        const fail  = isNotOkay(row.data[lastIdx]);
+        const rowCl = isHL ? "row-highlight" : fail ? "row-fail" : ri % 2 === 0 ? "row-even" : "row-odd";
+
+        const cells = row.data.map((cell, ci) => {
+          if (ci === lastIdx) return `<td>${cell ? makeBadge(cell) : '<span class="dash">—</span>'}</td>`;
+          if (ci === 0) {
+            const arrow = isHL ? '<span class="hl-arrow">▶</span>' : "";
+            return `<td class="${isHL ? "cell-key-hl" : "cell-key"}">${arrow}${cell}</td>`;
+          }
+          if (ci === 1) return `<td class="cell-val">${cell || '<span class="dash">—</span>'}</td>`;
+          return `<td class="cell-empty">${cell || "—"}</td>`;
+        }).join("");
+
+        return `<tr class="${rowCl}">${cells}</tr>`;
+      }).join("");
+
+      // footer stats
+      const statsHtml = [
+        `<span class="footer-stat"><span class="stat-blue">${passCount}</span> passed</span>`,
+        failCount ? `<span class="footer-stat"><span class="stat-red">${failCount}</span> not okay</span>` : "",
+        hlCount   ? `<span class="footer-stat"><span class="stat-amber">${hlCount}</span> highlighted</span>` : ""
+      ].filter(Boolean).join("");
+
+      // block
+      const block = document.createElement("div");
+      block.className = "sheet-block";
+      block.innerHTML = `
+        <div class="sheet-header">
+          <span class="sheet-name">${sheet.name}</span>
+          <div class="header-right">
+            <span class="status-pill ${status === "pass" ? "status-pass" : "status-fail"}">
+              ${status === "pass" ? "✓ pass" : "✗ fail"}
+            </span>
+            <button class="toggle-btn" id="${btnId}" onclick="toggleSheet('${bodyId}','${btnId}')">
+              Details <span class="arrow">▾</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="sheet-body" id="${bodyId}">
+          <div class="info-bar">${infoHtml}</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>${thHtml}</tr></thead>
+              <tbody>${trHtml}</tbody>
+            </table>
+          </div>
+          <div class="sheet-footer">
+            <span class="footer-meta">${sheet.rows.length} rows · ${sheet.columns.length} columns</span>
+            <div class="footer-stats">${statsHtml}</div>
+          </div>
+        </div>`;
+
+      container.appendChild(block);
+    });
+  }
+
+  renderAll();
+</script>
+</body>
+</html>
       white-space: nowrap;
     }
 
