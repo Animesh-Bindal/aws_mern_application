@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Review Report</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      font-family: 'Courier New', Courier, monospace;
+      padding: 36px 24px;
+      color: #f1f5f9;
+    }
+
+    /* ── Header ── */
+    .header { margin-bottom: 28px; }
+
+    .header-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #22d3ee;
+      box-shadow: 0 0 8px #22d3ee;
+      flex-shrink: 0;
+    }
+
+    .label-text {
+      color: #94a3b8;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .sheet-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #f1f5f9;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+    }
+
+    /* ── Pre-header info bar ── */
+    .info-bar {
+      background: rgba(15, 23, 42, 0.6);
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+    }
+
+    .info-item { display: flex; align-items: center; gap: 8px; }
+
+    .info-key {
+      color: #64748b;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .info-val {
+      color: #22d3ee;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* ── Table wrapper ── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    /* ── Column headers ── */
+    thead th {
+      padding: 12px 20px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.4);
+      border-bottom: 1px solid rgba(148,163,184,0.1);
+      border-right: 1px solid rgba(148,163,184,0.06);
+      white-space: nowrap;
+    }
+
+    thead th:last-child { border-right: none; }
+
+    /* ── Body rows ── */
+    tbody tr {
+      transition: background 0.15s;
+      cursor: default;
+    }
+
+    tbody tr.row-even  { background: transparent; }
+    tbody tr.row-odd   { background: rgba(255,255,255,0.02); }
+    tbody tr.row-highlight { background: rgba(234,179,8,0.07); }
+
+    tbody tr.row-even:hover,
+    tbody tr.row-odd:hover  { background: rgba(34,211,238,0.05); }
+    tbody tr.row-highlight:hover { background: rgba(234,179,8,0.14); }
+
+    tbody td {
+      padding: 13px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(148,163,184,0.07);
+      border-right: 1px solid rgba(148,163,184,0.06);
+      color: #475569;
+    }
+
+    tbody td:last-child { border-right: none; }
+
+    /* cell roles */
+    td.cell-key         { color: #cbd5e1; font-weight: 600; }
+    td.cell-key-hl      { color: #fbbf24; font-weight: 600; }
+    td.cell-val         { color: #f1f5f9; font-weight: 500; }
+    td.cell-empty       { color: #334155; }
+
+    .hl-arrow { color: #fbbf24; font-size: 10px; margin-right: 6px; }
+
+    /* ── Result badge ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .badge-pass {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .badge-fail {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .dash { color: #334155; }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 12px 24px;
+      border-top: 1px solid rgba(148,163,184,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-meta { color: #475569; font-size: 11px; }
+
+    .footer-stats { display: flex; gap: 18px; }
+
+    .footer-stat { color: #475569; font-size: 11px; }
+    .stat-cyan    { color: #22d3ee; font-weight: 700; }
+    .stat-yellow  { color: #fbbf24; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">
+    <div class="dot"></div>
+    <span class="label-text">Review Report</span>
+  </div>
+  <div class="sheet-title" id="sheetTitle"></div>
+</div>
+
+<div class="card">
+  <div class="info-bar"  id="infoBar"></div>
+  <div class="table-wrap">
+    <table>
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <div class="footer">
+    <span class="footer-meta" id="footerMeta"></span>
+    <div class="footer-stats" id="footerStats"></div>
+  </div>
+</div>
+
+<script>
+  const sheetData = {
+    sheets: [
+      {
+        name: "Q4KS95@T-RSMFAKUC-0090",
+        Pre_header_rows: [
+          { type: "normal", data: ["Chipset : ", "T-RSMFAKUC", "", "", "", ""] },
+          { type: "normal", data: ["Model : ",   "Q4KS95",     "", "", "", ""] },
+        ],
+        columns: [
+          "Review requisites",
+          "Review details",
+          "GMAP (size)",
+          "Server (size)/contents",
+          "From packages",
+          "Result",
+        ],
+        Rows: [
+          { type: "normal",    data: ["Version name : ",   "Q4KS95@T-RSMFAKUC-0090", "", "", "", "pass"] },
+          { type: "normal",    data: ["Version number : ", "1296.8",                  "", "", "", "pass"] },
+          { type: "normal",    data: ["EDID change : ",    "Yes",                     "", "", "", "pass"] },
+          { type: "normal",    data: ["Otn only : ",       "N",                       "", "", "", "pass"] },
+          { type: "normal",    data: ["Usb upgrade : ",    "Y",                       "", "", "", "pass"] },
+          { type: "Highlight", data: ["Otn only : ",       "N",                       "", "", "", "pass"] },
+        ],
+      },
+    ],
+  };
+
+  function makeBadge(value) {
+    if (!value) return '<span class="dash">—</span>';
+    const isPass = value.toLowerCase() === "pass";
+    const icon   = isPass ? "✓" : "✗";
+    const cls    = isPass ? "badge badge-pass" : "badge badge-fail";
+    return `<span class="${cls}">${icon} ${value}</span>`;
+  }
+
+  function render() {
+    const sheet = sheetData.sheets[0];
+
+    // Title
+    document.getElementById("sheetTitle").textContent = sheet.name;
+
+    // Info bar
+    const infoBar = document.getElementById("infoBar");
+    sheet.Pre_header_rows.forEach(row => {
+      const key = row.data[0].replace(" : ", "");
+      const val = row.data[1];
+      infoBar.innerHTML += `
+        <div class="info-item">
+          <span class="info-key">${key}</span>
+          <span class="info-val">${val}</span>
+        </div>`;
+    });
+
+    // Table head
+    const thead = document.getElementById("tableHead");
+    const headerCells = sheet.columns.map(c => `<th>${c}</th>`).join("");
+    thead.innerHTML = `<tr>${headerCells}</tr>`;
+
+    // Table body
+    const tbody = document.getElementById("tableBody");
+    const lastIdx = sheet.columns.length - 1;
+
+    sheet.Rows.forEach((row, rowIdx) => {
+      const isHL = row.type === "Highlight";
+      let rowClass = isHL ? "row-highlight" : (rowIdx % 2 === 0 ? "row-even" : "row-odd");
+
+      const cells = row.data.map((cell, ci) => {
+        // Last column → badge
+        if (ci === lastIdx) {
+          return `<td>${cell ? makeBadge(cell) : '<span class="dash">—</span>'}</td>`;
+        }
+        // Key column (index 0)
+        if (ci === 0) {
+          const cls = isHL ? "cell-key-hl" : "cell-key";
+          const arrow = isHL ? '<span class="hl-arrow">▶</span>' : "";
+          return `<td class="${cls}">${arrow}${cell}</td>`;
+        }
+        // Value column (index 1)
+        if (ci === 1) {
+          return `<td class="cell-val">${cell || '<span class="dash">—</span>'}</td>`;
+        }
+        // Empty middle columns
+        return `<td class="cell-empty">${cell || "—"}</td>`;
+      }).join("");
+
+      tbody.innerHTML += `<tr class="${rowClass}">${cells}</tr>`;
+    });
+
+    // Footer
+    const passCount = sheet.Rows.filter(r => r.data[lastIdx]?.toLowerCase() === "pass").length;
+    const hlCount   = sheet.Rows.filter(r => r.type === "Highlight").length;
+
+    document.getElementById("footerMeta").textContent =
+      `${sheet.Rows.length} rows · ${sheet.columns.length} columns`;
+
+    document.getElementById("footerStats").innerHTML = `
+      <span class="footer-stat"><span class="stat-cyan">${passCount}</span> passed</span>
+      <span class="footer-stat"><span class="stat-yellow">${hlCount}</span> highlighted</span>`;
+  }
+
+  render();
+</script>
+</body>
+</html>
